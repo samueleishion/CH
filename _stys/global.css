@@ -50,6 +50,7 @@ h2 { line-height:10px;
 	text-shadow:0px 0px 2px #777; 
 	cursor:pointer; 
 	z-index:3; }
+.icon#mag_glass { text-shadow:0px 0px 0px #fff; }
 
 .icon#mag_glass { left:478px;  
 	font-size:18pt; 
