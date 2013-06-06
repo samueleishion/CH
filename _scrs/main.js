@@ -65,19 +65,81 @@ function selectVisualizationType() {
 	}); 
 }
 
+function alertNoResults() {
+	$('.alert#noresults').fadeIn(200).delay(1000).fadeOut(1000);
+}
+
+function generateMarkers(tweets) {
+	// Remove previous markers and information
+	// windows from map
+	for(var i = 0; i < markers.length; i++) {
+		if(markers[i]!=null) markers[i].setMap(null); 
+		if(infowins[i]!=null) infowins[i].setMap(null); 
+	} 
+	
+	var coords; 
+	var point; 
+	var marker; 
+	var text; 
+	var info; 
+	var prevwin = 0; 
+	for(var i = 0; i < tweets.statuses.length; i++) {
+		// Clear previous list of markers and 
+		// information windows 
+		if(i==0) {
+			markers = []; 
+			infowins = []; 
+		}
+		// Add tweets with geolocation to 
+		// list and set its marker to map
+		if(tweets.statuses[i].geo!=null &&
+			(tweets.statuses[i].geo.coordinates[0]!=0 &&
+			 tweets.statuses[i].geo.coordinates[1]!=0)) {
+			// set marker to map
+			coords = tweets.statuses[i].geo.coordinates; 
+			point = new google.maps.LatLng(coords[0],coords[1]); 
+			marker = new google.maps.Marker({
+				position:point, 
+				map:map, 
+				icon:'_imgs/marker.png', 
+				animation: google.maps.Animation.DROP, 
+				id: i
+			}); 
+			
+			markers[i] = marker; 
+			
+			// set info window on map
+			text = "\""+tweets.statuses[i].text+"\" by "+
+				"<a href=\"\">@"+tweets.statuses[i].user.screen_name+"</a>"+
+				"<br><b>Coords:</b> "+coords[0]+","+coords[1]+
+				"<br><b>Lang:</b> "+tweets.statuses[i].lang; 
+			info = new google.maps.InfoWindow({
+				content:text, 
+				position:point
+			}); 
+			
+			infowins[i] = info; 
+			
+			// connect marker to info window
+			google.maps.event.addListener(marker,'click',function() {
+				// close previous window and open the one 
+				// corresponding to the marker clicked. 
+				if(infowins[prevwin]!=null) infowins[prevwin].close(); 
+				infowins[this.id].open(map,this); 
+				console.log(this.id+"=>"+infowins[this.id].content); 
+				prevwin = this.id; 
+			}); 
+		}
+	}
+	
+	if(markers.length==0) alertNoResults(); 
+	console.log(markers); 
+}
+
 $(document).ready(function() {
 	initialize();
 	selectVisualizationType(); 
 	var search = $('.search');
-	
-	// Search enetered word
-	search.keyup(function(e) {
-		if(e.which==13) $('.icon#mag_glass').click(); 
-	}); 
-	
-	$('.icon#mag_glass').click(function() {
-		preprocess(search.val());  
-	});  
 	
 	// Settings
 	$('.icon#settings').click(function() {
@@ -86,5 +148,41 @@ $(document).ready(function() {
 	$('.alert#settings #close').click(function() {
 		$('.alert#settings').fadeOut(); 
 	}); 
+	
+	// Seatch entered word
+	search.keyup(function(e) {
+		if(e.which==13) $('.icon#mag_glass').click(); 
+	}); 
+	
+	$('.icon#mag_glass').click(function() {
+		console.log("searching..."); 
+		var fetch = 'tweets';
+		var word = search.val(); 
+		var lang = 'es';  
+		$.ajax({
+			type:'POST',
+			url:'../_app/engine.php', 
+			data: {
+				fetch: fetch, 
+				word: word, 
+				lang: lang
+			}, 
+			success: function(data) {
+				if(data!='' || data!=null || !data.length>0) {
+					var tweets = jQuery.parseJSON(data);
+					console.log(tweets); 
+					generateMarkers(tweets); 
+				} else {
+					alertNoResults();  
+				}
+			}, 
+			error: function (xhr, ajaxOptions, thrownError) {
+				console.log(xhr.status);
+				console.log(thrownError);
+			}
+		}); 
+	}); 
 }); 
+
+
 
