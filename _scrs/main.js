@@ -110,7 +110,7 @@ function generateMarkers(tweets) {
 			
 			// set info window on map
 			text = "\""+tweets.statuses[i].text+"\" by "+
-				"<a href=\"\">@"+tweets.statuses[i].user.screen_name+"</a>"+
+				"<a href=\"http://twitter.com/"+tweets.statuses[i].user.screen_name+"\">@"+tweets.statuses[i].user.screen_name+"</a>"+
 				"<br><b>Coords:</b> "+coords[0]+","+coords[1]+
 				"<br><b>Lang:</b> "+tweets.statuses[i].lang; 
 			info = new google.maps.InfoWindow({

@@ -1,5 +1,5 @@
 <?
- 
+header("Access-Control-Allow-Origin: *");
 require('settings.php');
 
 $fetch = clean($_POST['fetch']);
