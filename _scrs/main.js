@@ -182,6 +182,11 @@ $(document).ready(function() {
 			}
 		}); 
 	}); 
+	
+	// Mobile site representation of the app
+	$('.get').click(function() {
+		window.location='app.html'; 
+	}); 
 }); 
 
 
