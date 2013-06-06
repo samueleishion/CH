@@ -71,7 +71,7 @@ function alertNoResults() {
 
 function generateMarkers(tweets) {
 	// Remove previous markers and information
-	// windows from map
+	// windows from map 
 	for(var i = 0; i < markers.length; i++) {
 		if(markers[i]!=null) markers[i].setMap(null); 
 		if(infowins[i]!=null) infowins[i].setMap(null); 
