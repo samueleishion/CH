@@ -8,7 +8,7 @@
 
 <form method="post" action="engine.php">
  <input type="hidden" name="fetch" value="tweets">
- <input type="hidden" name="language" value="es">
+ <input type="hidden" name="lang" value="es">
  <input type="text" name="word" placeholder="word"><br>
  <input type="submit" value="submit">
 </form>

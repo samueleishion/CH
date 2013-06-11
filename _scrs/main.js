@@ -16,10 +16,14 @@ function initialize() {
 		center: center, 
 		mapTypeId: google.maps.MapTypeId.ROADMAP,  
 		panControl: false, 
-		zoomControl: false, 
 		streetViewControl: false, 
 		mapTypeControl: false, 
-		scaleControl: true
+		scaleControl: true, 
+		zoomControl: true, 
+		zoomControlOptions: {
+			style: google.maps.ZoomControlStyle.LARGE, 
+			position: google.maps.ControlPosition.LEFT_CENTER
+		}
 	} 
 	
 	map = new google.maps.Map(document.getElementById('map-canvas'),options);
@@ -108,17 +112,6 @@ function generateMarkers(tweets) {
 			'rgba(250,31,176,1)', 
 			'rgba(254,9,234,1)',
 			'rgba(254,9,234,1)'
-			
-			// 'rgba(254,9,234,0)',
-			// 'rgba(254,9,234,1)',
-			// 'rgba(250,31,176,1)', 
-			// 'rgba(246,57,115,1)',
-			// 'rgba(244,71,81,1)',
-			// 'rgba(242,86,45,1)',
-			// 'rgba(243,113,34,1)',
-			// 'rgba(243,113,34,1)',
-			// 'rgba(246,135,31,1)',
-			// 'rgba(246,135,31,1)',
 		]; 
 		var temp = 0; 
 		for(var i = 0; i < tweets.statuses.length; i++) {
@@ -213,20 +206,46 @@ $(document).ready(function() {
 	$('.alert#settings #close').click(function() {
 		$('.alert#settings').fadeOut(); 
 	}); 
+
+	// Random word
+	$('.icon#random').click(function() {
+		console.log("searching...");  
+		var fetch = 'random'; 
+		var lang = 'es'; 
+		$.ajax({
+			type:'POST', 
+			url:'../_app/engine.php', 
+			data: {
+				fetch: fetch, 
+				lang: lang
+			}, 
+			success: function(data) {
+				search.val(data); 
+				$('.icon#mag_glass').click(); 
+			}, 
+			error: function (xhr, ajaxOptions, thrownError) {
+				$('.alert#loading').hide(); 
+				console.log(xhr.status);
+				console.log(thrownError);
+			}
+		}); 
+	}); 
 	
-	// Seatch entered word
+	// Search entered word
 	search.keyup(function(e) {
 		if(e.which==13) $('.icon#mag_glass').click(); 
 	}); 
 	
 	$('.icon#mag_glass').click(function() {
-		console.log("searching..."); 
+		console.log("searching...");
+		$('.alert#loading').fadeIn();  
 		var fetch = 'tweets';
 		var word = search.val(); 
 		var lang = 'es';  
 		$.ajax({
 			type:'POST',
 			url:'../_app/engine.php', 
+			async: false, 
 			data: {
 				fetch: fetch, 
 				word: word, 
@@ -240,12 +259,15 @@ $(document).ready(function() {
 				} else {
 					alertNoResults();  
 				}
+				$('.alert#loading').hide(); 
 			}, 
 			error: function (xhr, ajaxOptions, thrownError) {
+				$('.alert#loading').hide(); 
 				console.log(xhr.status);
 				console.log(thrownError);
 			}
 		}); 
+		$('.alert#loading').hide();  
 	}); 
 	
 	// Mobile site representation of the app
